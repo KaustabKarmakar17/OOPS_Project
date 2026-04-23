@@ -1,5 +1,4 @@
 :root {
-  /* Shadcn UI Color Variables (HSL) */
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
 
@@ -382,7 +381,7 @@ h6 {
 }
 .card-title {
   font-weight: 600;
-  leading-none: letter-spacing -0.025em;
+  letter-spacing: -0.025em;
 }
 .card-description {
   font-size: 0.875rem;
@@ -420,7 +419,6 @@ h6 {
   font-size: 0.75rem;
   color: hsl(var(--muted-foreground));
 }
-
 .dashboard-extra {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -478,7 +476,6 @@ h6 {
 .btn-primary:hover {
   background-color: hsl(var(--primary) / 0.9);
 }
-
 .btn-outline {
   display: inline-flex;
   align-items: center;
@@ -522,17 +519,23 @@ h6 {
   line-height: 1;
 }
 
-/* Table */
+/* Table Layout */
 .table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
+
+/* --- UPDATED: Sticky Table & Fixed Height --- */
 .table-wrapper {
   width: 100%;
-  overflow: auto;
+  max-height: 60vh; /* Limits table height allowing inner scroll */
+  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-x: auto; /* Enables horizontal scrolling */
+  position: relative;
 }
+
 .student-table {
   width: 100%;
   border-collapse: collapse;
@@ -543,7 +546,14 @@ h6 {
   padding: 0.75rem 1rem;
   font-weight: 500;
   color: hsl(var(--muted-foreground));
+  background-color: hsl(
+    var(--card)
+  ); /* Opaque background so rows slide under */
   border-bottom: 1px solid hsl(var(--border));
+  position: sticky; /* Makes header stick to top */
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 1px 0 hsl(var(--border)); /* Retains bottom border when sticky */
 }
 .student-table td {
   padding: 0.75rem 1rem;
@@ -560,7 +570,6 @@ h6 {
   border-bottom: 0;
 }
 
-/* Subtle Highlighting matching Shadcn style */
 .cgpa-low td {
   color: hsl(var(--destructive));
 }
@@ -604,7 +613,7 @@ h6 {
   border-color: hsl(var(--foreground));
 }
 
-/* Toast Notification (Shadcn style) */
+/* Toast Notification */
 .toast-container {
   position: fixed;
   bottom: 20px;
@@ -659,6 +668,38 @@ h6 {
   }
 }
 
+/* =========================================
+   ADDITIONS FOR ALIGNED UI (Badges) 
+   ========================================= */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+.badge-improving {
+  background-color: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+.badge-declining {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+.badge-stable {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.input-group label {
+  margin-bottom: 0.25rem;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .dashboard-extra,
@@ -688,4 +729,30 @@ h6 {
   .metrics-grid {
     grid-template-columns: 1fr;
   }
+  .prediction-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =========================================
+   CUSTOM SCROLLBARS 
+   ========================================= */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
 }
