@@ -27,19 +27,33 @@ void Dataset::loadCSV(const string &filename) {
             cols.push_back(val);
         }
 
-        if (cols.size() < 8)
+        // Actual CSV schema (7 cols):
+        //   [0] registration_no
+        //   [1] actual_cg  <- TARGET
+        //   [2] last_gp  (raw total grade points, e.g. 244.0)
+        //   [3] avg_gp
+        //   [4] fail_count
+        //   [5] performance_variance
+        //   [6] gp_trend ("Stable" | "Improving" | "Declining")
+        if (cols.size() < 7)
             continue;
 
         try {
-            double variance = stod(cols[2]);
-            double avg = stod(cols[4]);
-            double last = stod(cols[5]);
-            double trend = stod(cols[6]);
-            double target = stod(cols[7]);
+            double target    = stod(cols[1]);
+            double last      = stod(cols[2]);
+            double avg       = stod(cols[3]);
+            double variance  = stod(cols[5]);
+            string trend_str = cols[6]; // "Stable" | "Improving" | "Declining"
+            double trend = 0.0;
+            if (trend_str == "Improving")      trend =  1.0;
+            else if (trend_str == "Declining") trend = -1.0;
+            // "Stable" stays 0.0
 
             if (target <= 0.0 || avg > 20.0)
                 continue;
 
+            // Features: avg_gp, last_gp (raw), trend, variance
+            // Matches computeFeatures in App.cpp: {avg, last, trend, var}
             X.push_back({avg, last, trend, variance});
             y.push_back(target);
 
@@ -50,47 +64,3 @@ void Dataset::loadCSV(const string &filename) {
 
     cout << "Loaded rows: " << X.size() << endl;
 }
-// #include "Dataset.h"
-// #include <fstream>
-// #include <sstream>
-
-// void Dataset::loadCSV(const string& filename) {
-//     ifstream file(filename);
-//     string line;
-
-//     getline(file, line); // skip header
-
-//     while (getline(file, line)) {
-//         if (line.empty()) continue;
-
-//         stringstream ss(line);
-//         string value;
-//         vector<double> row;
-
-//         while (getline(ss, value, ',')) {
-//             row.push_back(stod(value));
-//         }
-
-//         data.push_back(row);
-//     }
-// }
-
-// vector<vector<double>> Dataset::getFeatures(int col) {
-//     vector<vector<double>> X;
-
-//     for (auto& row : data) {
-//         X.push_back({row[col]});
-//     }
-
-//     return X;
-// }
-
-// vector<double> Dataset::getColumn(int col) {
-//     vector<double> y;
-
-//     for (auto& row : data) {
-//         y.push_back(row[col]);
-//     }
-
-//     return y;
-// }

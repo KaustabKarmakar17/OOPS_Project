@@ -78,7 +78,9 @@ namespace
         else
             avg = 0;
 
-        const double last = sems[n - 1];
+        // The ML model was trained on 'last_gp' from the CSV, which is exactly 'avg_gp * 28.0'
+        // Passing sems[n - 1] (e.g., 8.9) breaks the prediction since the model expects ~250.0
+        const double last = avg * 28.0;
         const double trend = (sems[n - 1] - sems[0]) / static_cast<double>(n);
 
         double var = 0;
@@ -149,14 +151,14 @@ namespace
 
 void App::registerRoutes()
 {
-    // ---------------------------------------------------------
-    // 1. /users (GET)
-    // ---------------------------------------------------------
+    // Enable CORS (fixes browser "CORS error" / preflight failures)
     auto& cors = app.get_middleware<crow::CORSHandler>();
     cors.global()
         .origin("*")
         .headers("Content-Type")
         .methods("GET"_method, "POST"_method, "PUT"_method, "OPTIONS"_method);
+
+    // GET /users
     CROW_ROUTE(app, "/users")
         .methods("GET"_method)([&](const crow::request &req, crow::response &res)
                                                  {
@@ -183,7 +185,8 @@ void App::registerRoutes()
         ApiResponse api_res(true, "Users fetched successfully", data);
         res.code = 200;
         res.body = api_res.toJson().dump();
-        res.end(); });
+        res.end();
+    });
 
     // ---------------------------------------------------------
     // 2. /users/<string> (GET, PUT)
@@ -368,7 +371,8 @@ void App::registerRoutes()
         ApiResponse api_res(true, "Prediction successful", std::move(data));
         res.code = 200;
         res.body = api_res.toJson().dump();
-        res.end(); });
+        res.end();
+    });
 }
 
 void App::run(int port)

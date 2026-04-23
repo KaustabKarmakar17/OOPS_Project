@@ -31,10 +31,13 @@ void Dataset::loadCSV(const string &filename) {
             continue;
 
         try {
-            double variance = stod(cols[2]);
-            double avg = stod(cols[4]);
-            double last = stod(cols[5]);
-            double trend = stod(cols[6]);
+            double variance  = stod(cols[2]);
+            double avg       = stod(cols[4]);
+            double last      = stod(cols[5]);
+            string trend_str = cols[6]; // "Stable" | "Improving" | "Declining"
+            double trend = 0.0;
+            if (trend_str == "Improving")      trend =  1.0;
+            else if (trend_str == "Declining") trend = -1.0;
             double target = stod(cols[7]);
 
             if (target <= 0.0 || avg > 20.0)

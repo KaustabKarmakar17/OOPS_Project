@@ -36,15 +36,13 @@ string getLabel(int c) {
 }
 
 // ---------- feature computation ----------
-// Produces the SAME 5-feature vector as dataset.h:
+// Produces the SAME 4-feature vector as dataset.cpp:
 //   [0] avg_gp        — credit-weighted average GPA
-//   [1] last_gp_norm  — total grade points per semester / 28.0  (matches CSV last_gp/28)
+//   [1] last_gp_norm  — total grade points / (n * 28.0)  (matches CSV last_gp/28)
 //   [2] trend         — Improving=1, Stable=0, Declining=-1
 //   [3] variance      — variance of semester GPAs
-//   [4] fail_cnt      — number of failed subjects
 vector<double> computeFeatures(const vector<double>& sems,
-                                const vector<double>& credits,
-                                int fail_cnt) {
+                                const vector<double>& credits) {
     int n = sems.size();
 
     // Weighted average GPA
@@ -56,14 +54,13 @@ vector<double> computeFeatures(const vector<double>& sems,
     }
     double avg_gp = (total_credits > 0) ? total_grade_points / total_credits : 0.0;
 
-    // last_gp_norm: matches CSV formula  last_gp = total_grade_points / n,  then / 28.0
+    // last_gp_norm: matches CSV col[5] (last_gp) / 28.0
     double last_gp_norm = (n > 0) ? (total_grade_points / n) / 28.0 : 0.0;
 
     // gp_trend: compare last vs first semester GPA
-    // Threshold 0.3 per semester to mark as Improving/Declining
     double trend = 0.0;
     if (n > 1) {
-        double slope = (sems[n - 1] - sems[0]); // total change over all sems
+        double slope = (sems[n - 1] - sems[0]);
         if      (slope >  0.3) trend =  1.0; // Improving
         else if (slope < -0.3) trend = -1.0; // Declining
         // else Stable → 0.0
@@ -75,7 +72,7 @@ vector<double> computeFeatures(const vector<double>& sems,
         var += pow(s - avg_gp, 2);
     var /= n;
 
-    return {avg_gp, last_gp_norm, trend, var, (double)fail_cnt};
+    return {avg_gp, last_gp_norm, trend, var};
 }
 
 // ---------- distribution ----------
@@ -189,9 +186,10 @@ int main() {
         cout << "\nTotal failed subjects (across all semesters): ";
         cin >> fail_cnt;
         if (fail_cnt < 0) fail_cnt = 0;
+        (void)fail_cnt; // not used as a feature (4-feature model)
 
         // ----- Compute features -----
-        vector<double> features = computeFeatures(sems, credits, fail_cnt);
+        vector<double> features = computeFeatures(sems, credits);
 
         // ----- LR prediction -----
         double pred_cg = lr.predict(features);

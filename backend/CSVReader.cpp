@@ -26,19 +26,18 @@ vector<crow::json::wvalue> CSVReader::readUsers(const string& filename) {
             cols.push_back(val);
         }
 
-        if (cols.size() < 8) continue;
+        if (cols.size() < 7) continue;
 
         try {
             crow::json::wvalue user;
 
             user["registration_no"] = cols[0];
-            user["wgpa"] = stod(cols[1]);
-            user["performance_variance"] = stod(cols[2]);
-            user["fail_count"] = stoi(cols[3]);
-            user["avg_gp"] = stod(cols[4]);
-            user["last_gp"] = stod(cols[5]);
-            user["gp_trend"] = stod(cols[6]);
-            user["actual_cg"] = stod(cols[7]);
+            user["actual_cg"] = stod(cols[1]);
+            user["last_gp"] = stod(cols[2]);
+            user["avg_gp"] = stod(cols[3]);
+            user["fail_count"] = stoi(cols[4]);
+            user["performance_variance"] = stod(cols[5]);
+            user["gp_trend"] = cols[6];       // string: "Stable" | "Improving" | "Declining"
 
             users.push_back(user);
 
@@ -74,18 +73,17 @@ bool CSVReader::updateUser(const string& filename,
             cols.push_back(val);
         }
 
-        if (cols.size() < 8) continue;
+        if (cols.size() < 7) continue;
 
         if (cols[0] == reg_no) {
 
             // update fields (only if present)
-            if (body.has("wgpa")) cols[1] = to_string(body["wgpa"].d());
-            if (body.has("performance_variance")) cols[2] = to_string(body["performance_variance"].d());
-            if (body.has("fail_count")) cols[3] = to_string(body["fail_count"].i());
-            if (body.has("avg_gp")) cols[4] = to_string(body["avg_gp"].d());
-            if (body.has("last_gp")) cols[5] = to_string(body["last_gp"].d());
-            if (body.has("gp_trend")) cols[6] = to_string(body["gp_trend"].d());
-            if (body.has("actual_cg")) cols[7] = to_string(body["actual_cg"].d());
+            if (body.has("actual_cg")) cols[1] = to_string(body["actual_cg"].d());
+            if (body.has("last_gp")) cols[2] = to_string(body["last_gp"].d());
+            if (body.has("avg_gp")) cols[3] = to_string(body["avg_gp"].d());
+            if (body.has("fail_count")) cols[4] = to_string(body["fail_count"].i());
+            if (body.has("performance_variance")) cols[5] = to_string(body["performance_variance"].d());
+            if (body.has("gp_trend")) cols[6] = body["gp_trend"].s(); // string field
 
             updated = true;
         }
@@ -137,18 +135,17 @@ crow::json::wvalue CSVReader::getUserById(const string& filename,
             cols.push_back(val);
         }
 
-        if (cols.size() < 8) continue;
+        if (cols.size() < 7) continue;
 
         if (cols[0] == reg_no) {
 
             user["registration_no"] = cols[0];
-            user["wgpa"] = stod(cols[1]);
-            user["performance_variance"] = stod(cols[2]);
-            user["fail_count"] = stoi(cols[3]);
-            user["avg_gp"] = stod(cols[4]);
-            user["last_gp"] = stod(cols[5]);
-            user["gp_trend"] = stod(cols[6]);
-            user["actual_cg"] = stod(cols[7]);
+            user["actual_cg"] = stod(cols[1]);
+            user["last_gp"] = stod(cols[2]);
+            user["avg_gp"] = stod(cols[3]);
+            user["fail_count"] = stoi(cols[4]);
+            user["performance_variance"] = stod(cols[5]);
+            user["gp_trend"] = cols[6];       // string: "Stable" | "Improving" | "Declining"
 
             return user;
         }
