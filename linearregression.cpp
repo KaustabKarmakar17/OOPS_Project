@@ -63,8 +63,9 @@ void LinearRegression::fit(const vector<vector<double>>& X, const vector<double>
             db += error;
         }
 
+        double lambda = 0.1; // Ridge Regularization to stabilize collinear weights
         for (int j = 0; j < m; j++)
-            weights[j] -= lr * dw[j] / n;
+            weights[j] -= lr * (dw[j] / n + lambda * weights[j]);
 
         bias -= lr * db / n;
     }
